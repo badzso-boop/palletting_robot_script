@@ -1,0 +1,1 @@
+RoboDK-val futószalagról raklapra pakolás + Robot irányítása Playstation Controller-el
