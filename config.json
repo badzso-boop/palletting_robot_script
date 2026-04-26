@@ -2,10 +2,10 @@
   "ROBODK_IP": "100.123.35.110",
   "ITEMS": {
     "ROBOT": "UR20",
-    "RAIL": "Brooks PreciseFlex Linear Rail 2000",
+    "CONVEYOR": "Conveyor Belt Wide",
     "GRIPPER": "OnRobot VGP20 Vacuum Gripper",
     "BOX_CENTER_PICKUP": "Box Center Pickup Point",
     "PALLET_FRAME": "Pallet Frame 40x48",
-    "BOX": "Box 12x10in (Closed)"
+    "BOX_PREFIX": "Box 12x10in "
   }
 }

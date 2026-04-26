@@ -1,23 +1,32 @@
 import json
 from robodk import robolink
 
-# Konfiguráció betöltése
+# 1. Betöltés
 with open('config.json', 'r') as f:
     config = json.load(f)
-
 RDK = robolink.Robolink(robodk_ip=config['ROBODK_IP'])
 
 if not RDK.Connect():
-    print(f"Hiba: Nem sikerült csatlakozni az IP-hez: {config['ROBODK_IP']}")
+    print(f"Hiba: Nem sikerült csatlakozni: {config['ROBODK_IP']}")
     exit()
 
-print("\n--- JELENLEGI ELEMEK A ROBODK-BAN ---")
 all_items = RDK.ItemList()
-for item in all_items:
-    print(f"[{item.Type()}] - '{item.Name()}'")
 
-print("\n--- KONFIGURÁCIÓBAN KERESETT ELEMEK ---")
-for key, name in config['ITEMS'].items():
-    found = RDK.Item(name)
-    status = "OK" if found.Valid() else "NEM TALÁLHATÓ!"
-    print(f"{key}: '{name}' -> {status}")
+print("\n--- ROBODK ÁLLOMÁS RÉSZLETES ADATAI ---")
+print("Név | Típus | Szülő | Pozíció [X, Y, Z, rx, ry, rz]")
+print("-" * 60)
+
+for item in all_items:
+    name = item.Name()
+    type_id = item.Type()
+    parent = item.Parent()
+    parent_name = parent.Name() if parent.Valid() else "Station"
+    
+    # Pozíció lekérése listaként [X, Y, Z, rx, ry, rz]
+    # A Pose() a szülőhöz képesti helyzetet adja meg
+    pose_list = item.Pose().tolist()
+    
+    print(f"['{name}'] | Típus: {type_id} | Szülő: '{parent_name}'")
+    print(f"  Pose: {pose_list}")
+
+print("-" * 60)
