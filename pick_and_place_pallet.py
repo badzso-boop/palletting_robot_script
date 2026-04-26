@@ -22,7 +22,7 @@ robot.setSpeed(300)
 robot.setRounding(50)
 
 # 2. Raklapozási adatok (40x48 inch raklap, 12x10 inch doboz, 10mm margó)
-nx, ny, points = calculate_layout(40, 48, 12, 10, 10)
+nx, ny, points = calculate_layout(48, 48, 12, 10, 40)
 
 # Alap orientáció és eltolás (felvételhez)
 target_orientation = robomath.rotx(math.pi) * robomath.rotz(math.pi / 2)
@@ -30,7 +30,7 @@ target_offset = robomath.transl(130, 150, 0)
 
 # --- BIZTONSÁGI PONTOK ---
 conveyor_safety_joints = [-97.034195, -73.137776, 87.715327, -104.577551, -90.000000, -7.034195]
-elbow_up_joints = [85.360000, -68.630000, 97.530000, -119.200000, -92.070000, -94.770000]
+elbow_up_joints = [73.620629, -77.973517, 94.115421, -106.141905, -90.000000, -106.379371]
 
 # --- PROGRAM ---
 print(f"=== AUTOMATA SOROZAT-PALLETIZÁLÁS INDUL ===")
@@ -86,7 +86,7 @@ for i, (px, py) in enumerate(points):
     robot.setPoseFrame(pallet_frame)
     
     target_place = robomath.transl(px, py, 215) * target_orientation
-    target_place_approach = robomath.transl(px, py, 350) * target_orientation
+    target_place_approach = robomath.transl(px, py, 450) * target_orientation
 
     robot.MoveJ(target_place_approach)
     
@@ -98,7 +98,6 @@ for i, (px, py) in enumerate(points):
     time.sleep(0.3)
     
     robot.setRounding(50)
-    robot.MoveL(target_place_approach)
     
     # 5. VISSZATÉRÉS
     # robot.MoveJ(elbow_up_joints)
