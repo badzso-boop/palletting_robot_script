@@ -4,12 +4,10 @@ import time
 from robodk import robolink, robomath
 from calc_pallet import calculate_layout
 
-# 1. Betöltés és Kapcsolódás
 with open('config.json', 'r') as f:
     config = json.load(f)
 RDK = robolink.Robolink(robodk_ip=config['ROBODK_IP'])
 
-# Tárgyak lekérése
 items = config['ITEMS']
 robot = RDK.Item(items['ROBOT'])
 conveyor = RDK.Item(items['CONVEYOR'])
@@ -17,29 +15,22 @@ pickup_frame = RDK.Item(items['BOX_CENTER_PICKUP'])
 pallet_frame = RDK.Item(items['PALLET_FRAME'])
 gripper = RDK.Item(items['GRIPPER'])
 
-# Sebesség és Blending
 robot.setSpeed(300)
 robot.setRounding(50)
 
-# 2. Raklapozási adatok (40x48 inch raklap, 12x10 inch doboz, 10mm margó)
 nx, ny, points = calculate_layout(48, 48, 12, 10, 40)
 
-# Alap orientáció és eltolás (felvételhez)
 target_orientation = robomath.rotx(math.pi) * robomath.rotz(math.pi / 2)
 target_offset = robomath.transl(130, 150, 0)
 
-# --- BIZTONSÁGI PONTOK ---
 conveyor_safety_joints = [-97.034195, -73.137776, 87.715327, -104.577551, -90.000000, -7.034195]
 elbow_up_joints = [73.620629, -77.973517, 94.115421, -106.141905, -90.000000, -106.379371]
 
-# --- PROGRAM ---
 print(f"=== AUTOMATA SOROZAT-PALLETIZÁLÁS INDUL ===")
 
-# A szalagot alaphelyzetbe állítjuk (0 mm)
 conveyor.setJoints([0])
 
 for i, (px, py) in enumerate(points):
-    # Doboz neve dinamikusan (Box 12x10in 1, Box 12x10in 2...)
     box_name = f"{items['BOX_PREFIX']}{i+1}"
     current_box = RDK.Item(box_name)
     
@@ -49,14 +40,11 @@ for i, (px, py) in enumerate(points):
 
     print(f"\n>>> [{i+1}/12] {box_name} mozgatása ide: X={px:.1f}, Y={py:.1f}")
 
-    # 1. SZALAG MOZGATÁSA
-    # Minden doboznál 300mm-rel eltoljuk negatív irányba
     conv_pos = i * -300
     print(f"Szalag pozíció: {conv_pos} mm")
     conveyor.setJoints([conv_pos])
     time.sleep(0.2)
 
-    # 2. FELVÉTEL (PICK)
     robot.setRounding(50)
     robot.MoveJ(conveyor_safety_joints)
     
@@ -71,18 +59,14 @@ for i, (px, py) in enumerate(points):
     robot.setRounding(0)
     robot.MoveL(target_pick)
     
-    # Megfogjuk az AKTUÁLIS dobozt
     current_box.setParentStatic(gripper)
     time.sleep(0.3)
     
     robot.setRounding(50)
     robot.MoveL(target_pick_approach)
 
-    # 3. ÁTMENET A RAKLAPHOZ
-    # robot.MoveJ(conveyor_safety_joints) # Ezt kikommentelted korábban
     robot.MoveJ(elbow_up_joints)
 
-    # 4. LERAKÁS (PLACE)
     robot.setPoseFrame(pallet_frame)
     
     target_place = robomath.transl(px, py, 215) * target_orientation
@@ -93,14 +77,10 @@ for i, (px, py) in enumerate(points):
     robot.setRounding(0)
     robot.MoveL(target_place)
     
-    # Elengedjük a dobozt a raklapon
     current_box.setParentStatic(pallet_frame)
     time.sleep(0.3)
     
     robot.setRounding(50)
-    
-    # 5. VISSZATÉRÉS
-    # robot.MoveJ(elbow_up_joints)
 
 print("\nKész! A raklap megtelt.")
 robot.MoveJ(elbow_up_joints)

@@ -1,7 +1,6 @@
 import json
 from robodk import robolink
 
-# 1. Betöltés
 with open('config.json', 'r') as f:
     config = json.load(f)
 RDK = robolink.Robolink(robodk_ip=config['ROBODK_IP'])
@@ -22,8 +21,6 @@ for item in all_items:
     parent = item.Parent()
     parent_name = parent.Name() if parent.Valid() else "Station"
     
-    # Pozíció lekérése listaként [X, Y, Z, rx, ry, rz]
-    # A Pose() a szülőhöz képesti helyzetet adja meg
     pose_list = item.Pose().tolist()
     
     print(f"['{name}'] | Típus: {type_id} | Szülő: '{parent_name}'")
