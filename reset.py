@@ -22,7 +22,7 @@ print("Szalag visszaállítása...")
 conveyor.setJoints([0])
 
 print("Dobozok sorba rendezése a szalagon...")
-for i in range(1, 13):
+for i in range(1, 17):
     box_name = f"{box_prefix}{i}"
     box = RDK.Item(box_name)
     
