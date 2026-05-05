@@ -46,19 +46,21 @@ def run_palletizing(RDK, config):
         current_box.setParentStatic(gripper)
         time.sleep(0.3)
         robot.setRounding(50)
+        robot.setSpeed(50)
         robot.MoveL(target_pick_approach)
         robot.MoveJ(elbow_up_joints)
 
         robot.setPoseFrame(pallet_frame)
         target_place = robomath.transl(px, py, 215) * target_orientation
         target_place_approach = robomath.transl(px, py, 450) * target_orientation
-
+        
         robot.MoveJ(target_place_approach)
         robot.setRounding(0)
         robot.MoveL(target_place)
         current_box.setParentStatic(pallet_frame)
         time.sleep(0.3)
         robot.setRounding(50)
+        robot.setSpeed(300)
         robot.MoveL(target_place_approach)
 
     robot.MoveJ(elbow_up_joints)
